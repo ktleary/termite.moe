@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import "./App.css";
 import Home from "./components/home";
-import Tools from "./components/tools";
+import Login from "./components/auth/login";
 import About from "./components/about";
 
 import Header from "./components/header";
@@ -13,7 +13,7 @@ const Main = styled.main`
   margin: auto;
   max-width: 1100px;
   padding: 16px;
-`
+`;
 
 const App = () => (
   <div clasname="App">
@@ -30,8 +30,8 @@ const App = () => (
           <Route path="/about">
             <About />
           </Route>
-          <Route path="/tools">
-            <Tools />
+          <Route path="/login">
+            <Login />
           </Route>
           <Route path="/">
             <Home />

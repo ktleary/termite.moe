@@ -8,7 +8,8 @@ const HeaderContainer = styled.div`
   display: flex;
   height: 72px;
   margin: auto;
-  width: 1100px;
+  width: 100vw;
+  max-width: 1100px;
 `;
 const Logo = styled.div`
   font-size: 24px;
@@ -34,17 +35,18 @@ const NavLink = styled(Link)`
 const Header = () => (
   <HeaderContainer>
     <Logo>
-      <NavLink to="/">Source Lifter</NavLink>
+      <NavLink to="/">PostWorm</NavLink>
     </Logo>
     <Nav>
+
       <NavItem>
-        <NavLink to="/">Home</NavLink>
+        <NavLink to="/tools">Product</NavLink>
       </NavItem>
       <NavItem>
-        <NavLink to="/tools">Tools</NavLink>
+        <NavLink to="/about">About Us</NavLink>
       </NavItem>
       <NavItem>
-        <NavLink to="/about">About</NavLink>
+        <NavLink to="/login">Sign In</NavLink>
       </NavItem>
     </Nav>
   </HeaderContainer>
