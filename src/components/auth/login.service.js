@@ -1,4 +1,3 @@
-import useToken from "./useToken";
 export function validate({ username, password }) {
   return username.length > 3 && password.length > 3;
 }
@@ -9,10 +8,16 @@ const authorizeUser = ({ username, password }) =>
     return username && password ? resolve(token) : reject(false);
   });
 
-export const userLogin = async ({ username, password }) => {
+const setToken = ({ token }) => {
+  return localStorage.setItem("token", JSON.stringify(token));
+};
+
+export const UNSAFEuserLogin = async ({ username, password }) => {
   const token = await authorizeUser({ username, password });
   if (!token) return false;
   // eslint-disable-next-line fp/no-unused-expression
-  useToken.saveToken(token);
+  setToken({ token });
+  // eslint-disable-next-line fp/no-unused-expression
+  console.log(token);
   return true;
 };

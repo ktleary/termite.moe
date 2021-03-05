@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import { useHistory } from "react-router-dom";
 
-import { validate, userLogin } from "./login.service";
+import { validate, UNSAFEuserLogin } from "./login.service";
 // import { log } from "../../util";
 
 const LoginContainer = styled.div`
@@ -69,7 +69,7 @@ export default function Login() {
   const handleSubmit = e => {
     // eslint-disable-next-line fp/no-unused-expression
     e.preventDefault();
-    return !userLogin({ username, password })
+    return !UNSAFEuserLogin({ username, password })
       ? setMessage(STATUS.LOGINFAILED)
       // eslint-disable-next-line fp/no-mutating-methods
       : history.push("/app");
