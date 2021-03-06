@@ -8,7 +8,6 @@ import Home from "./components/home";
 import Login from "./components/auth/login";
 import About from "./components/about";
 import ViewContainer from "./components/viewer/view-container";
-import ViewHeader from "./components/viewer/view-header";
 import useToken from "./components/auth/useToken";
 
 import Header from "./components/header";
@@ -16,11 +15,13 @@ import Header from "./components/header";
 const Main = styled.main`
   margin: auto;
   max-width: 1100px;
-  padding: 16px;
+  padding: 0;
 `;
 
 function App() {
   const { token, setToken } = useToken();
+  // eslint-disable-next-line fp/no-unused-expression
+
 
   return (
     <div clasname="App">
@@ -32,21 +33,18 @@ function App() {
 
       <Router>
         <Main>
+          <Header token={token} setToken={setToken} />
           <Switch>
             <Route path="/viewer">
-              <ViewHeader />
               <ViewContainer token={token} />
             </Route>
             <Route path="/about">
-              <Header />
               <About />
             </Route>
             <Route path="/login">
-              <Header />
               <Login setToken={setToken} />
             </Route>
             <Route path="/">
-              <Header />
               <Home />
             </Route>
           </Switch>

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Link, useHistory } from "react-router-dom";
 
@@ -6,13 +7,13 @@ const HeaderContainer = styled.div`
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  height: 72px;
+  height: 48px;
   margin: auto;
   width: 100vw;
   max-width: 1100px;
 `;
 const Logo = styled.div`
-  font-size: 24px;
+  font-size: 21px;
   padding: 0 16px;
   width: 100%;
 `;
@@ -32,12 +33,14 @@ const NavLink = styled(Link)`
   font-size: 24px;
 `;
 
-const ViewHeader = () => {
+const ViewHeader = ({ setToken }) => {
   const history = useHistory();
 
   const handleSignOut = () => {
     // eslint-disable-next-line fp/no-unused-expression
     localStorage.removeItem("token");
+    // eslint-disable-next-line fp/no-unused-expression
+    setToken("");
     // eslint-disable-next-line fp/no-mutating-methods
     return history.push("/");
   };
@@ -58,3 +61,8 @@ const ViewHeader = () => {
 };
 
 export default ViewHeader;
+
+// eslint-disable-next-line fp/no-mutation
+ViewHeader.propTypes = {
+  setToken: PropTypes.func,
+};

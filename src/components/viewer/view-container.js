@@ -27,6 +27,6 @@ export default ViewContainer;
 
 // eslint-disable-next-line fp/no-mutation
 ViewContainer.propTypes = {
-  setToken: PropTypes.func.isRequired,
+  setToken: PropTypes.func,
   token: PropTypes.string,
 };
