@@ -1,11 +1,15 @@
 import React from "react";
 import styled from "styled-components";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+
 import { Helmet } from "react-helmet";
 import "./App.css";
 import Home from "./components/home";
 import Login from "./components/auth/login";
 import About from "./components/about";
+import ViewContainer from "./components/viewer/view-container";
+import ViewHeader from "./components/viewer/view-header";
+import useToken from "./components/auth/useToken";
 
 import Header from "./components/header";
 
@@ -15,31 +19,41 @@ const Main = styled.main`
   padding: 16px;
 `;
 
-const App = () => (
-  <div clasname="App">
-    <Helmet>
-      <html lang="en" />
-      <title>Source Lifter Home</title>
-      <meta name="description" content="Extract sources from text." />
-    </Helmet>
+function App() {
+  const { token, setToken } = useToken();
 
-    <Router>
-      <Header />
-      <Main>
-        <Switch>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/login">
-            <Login />
-          </Route>
-          <Route path="/">
-            <Home />
-          </Route>
-        </Switch>
-      </Main>
-    </Router>
-  </div>
-);
+  return (
+    <div clasname="App">
+      <Helmet>
+        <html lang="en" />
+        <title>PostWorm Home</title>
+        <meta name="description" content="Extract sources from text." />
+      </Helmet>
+
+      <Router>
+        <Main>
+          <Switch>
+            <Route path="/viewer">
+              <ViewHeader />
+              <ViewContainer token={token} />
+            </Route>
+            <Route path="/about">
+              <Header />
+              <About />
+            </Route>
+            <Route path="/login">
+              <Header />
+              <Login setToken={setToken} />
+            </Route>
+            <Route path="/">
+              <Header />
+              <Home />
+            </Route>
+          </Switch>
+        </Main>
+      </Router>
+    </div>
+  );
+}
 
 export default App;

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import { useHistory } from "react-router-dom";
+import PropTypes from "prop-types";
+import styled from "styled-components";
 
-import { validate, UNSAFEuserLogin } from "./login.service";
-// import { log } from "../../util";
+import { validate } from "./login.service";
 
 const LoginContainer = styled.div`
   max-width: 336px;
@@ -51,28 +51,38 @@ const SubmitButton = styled.button`
   }
 `;
 
-const STATUS = Object.freeze({
-  LOGINFAILED: "Login failed.",
-});
+async function loginUser(credentials) {
+  return fetch("http://localhost:3000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(credentials),
+  }).then(data => data.json());
+}
 
-export default function Login() {
+export default function Login({ setToken }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
   const isValid = validate({ username, password });
   const history = useHistory();
+
   const handleChange = e => {
     const { name, value } = e.target;
     return name === "username" ? setUsername(value) : setPassword(value);
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     // eslint-disable-next-line fp/no-unused-expression
     e.preventDefault();
-    return !UNSAFEuserLogin({ username, password })
-      ? setMessage(STATUS.LOGINFAILED)
-      // eslint-disable-next-line fp/no-mutating-methods
-      : history.push("/app");
+    const token = await loginUser({
+      username,
+      password,
+    });
+    // eslint-disable-next-line fp/no-unused-expression
+    setToken(token);
+    // eslint-disable-next-line fp/no-mutating-methods
+    return history.push("/viewer");
   };
 
   return (
@@ -106,7 +116,7 @@ export default function Login() {
           </Cell>
         </Row>
         <Row>
-          <Cell>{message}</Cell>
+          <Cell>message</Cell>
         </Row>
         <Row>
           <Cell>
@@ -119,3 +129,8 @@ export default function Login() {
     </LoginContainer>
   );
 }
+
+// eslint-disable-next-line fp/no-mutation
+Login.propTypes = {
+  setToken: PropTypes.func.isRequired,
+};
