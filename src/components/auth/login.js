@@ -79,10 +79,11 @@ export default function Login({ setToken }) {
       username,
       password,
     });
-    // eslint-disable-next-line fp/no-unused-expression
-    setToken(token);
+    // eslint-disable-next-line fp/no-mutating-methods, fp/no-unused-expression
+    return setToken(token, history.push("/viewer"));
     // eslint-disable-next-line fp/no-mutating-methods
-    return history.push("/viewer");
+
+    // eslint-disable-next-line fp/no-mutating-methods
   };
 
   return (

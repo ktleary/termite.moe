@@ -1,11 +1,10 @@
 import { useState } from "react";
-import * as R from "ramda";
 
 export default function useToken() {
   const getToken = () => {
     const tokenString = localStorage.getItem("token");
     const userToken = JSON.parse(tokenString);
-    return userToken && userToken.token ? R.toString(userToken.token) : false;
+    return userToken?.token;
   };
 
   const [token, setToken] = useState(getToken());

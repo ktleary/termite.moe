@@ -28,9 +28,12 @@ const NavItem = styled.div`
 `;
 
 const NavLink = styled(Link)`
-  color: rgba(255, 255, 255, 1);
+  color: rgba(255, 255, 255, 0.76);
   text-decoration: none;
-  font-size: 24px;
+  font-size: 21px;
+  &:hover {
+    color: rgba(255, 255, 255, 1);
+  }
 `;
 
 const ViewHeader = ({ setToken }) => {
@@ -47,7 +50,7 @@ const ViewHeader = ({ setToken }) => {
   return (
     <HeaderContainer>
       <Logo>
-        <NavLink to="/">PostWorm</NavLink>
+        <NavLink to="/">Beetz</NavLink>
       </Logo>
       <Nav>
         <NavItem>

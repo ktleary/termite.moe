@@ -35,16 +35,16 @@ const NavLink = styled(Link)`
   font-size: 21px;
 `;
 
-const Header = ({ setToken, token }) => {
+const Header = ({ setToken, isLoggedIn }) => {
   const { pathname } = useLocation();
   // eslint-disable-next-line fp/no-unused-expression
-  console.log({ token });
+  console.log({ isLoggedIn });
   return pathname === "/viewer" ? (
     <ViewHeader setToken={setToken} />
   ) : (
     <HeaderContainer>
       <Logo>
-        <NavLink to="/">PostWorm</NavLink>
+        <NavLink to="/">Beetz</NavLink>
       </Logo>
       <Nav>
         <NavItem>
@@ -54,7 +54,7 @@ const Header = ({ setToken, token }) => {
           <NavLink to="/about">About Us</NavLink>
         </NavItem>
         <NavItem>
-          {token ? (
+          {isLoggedIn ? (
             <NavLink to="/viewer">App</NavLink>
           ) : (
             <NavLink to="/login">Sign In</NavLink>
@@ -70,5 +70,5 @@ export default Header;
 // eslint-disable-next-line fp/no-mutation
 Header.propTypes = {
   setToken: PropTypes.func,
-  token: PropTypes.string,
+  isLoggedIn: PropTypes.bool,
 };

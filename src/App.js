@@ -1,8 +1,8 @@
-import React from "react";
-import styled from "styled-components";
+import React, { useMemo } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-
+import styled from "styled-components";
 import { Helmet } from "react-helmet";
+import * as R from "ramda";
 import "./App.css";
 import Home from "./components/home";
 import Login from "./components/auth/login";
@@ -18,25 +18,34 @@ const Main = styled.main`
   padding: 0;
 `;
 
+const checkAuth = token => {
+  // eslint-disable-next-line fp/no-unused-expression
+  console.log({ token });
+  // eslint-disable-next-line fp/no-unused-expression
+  console.log({ gt1: R.length(R.toString(token)) });
+  return R.gt(R.length(token), 1);
+};
+
 function App() {
   const { token, setToken } = useToken();
-  // eslint-disable-next-line fp/no-unused-expression
 
+  // eslint-disable-next-line fp/no-unused-expression
+  console.log(token);
+  const isLoggedIn = useMemo(() => checkAuth(token));
 
   return (
     <div clasname="App">
       <Helmet>
         <html lang="en" />
-        <title>PostWorm Home</title>
+        <title>Beetz Home</title>
         <meta name="description" content="Extract sources from text." />
       </Helmet>
-
       <Router>
         <Main>
-          <Header token={token} setToken={setToken} />
+          <Header isLoggedIn={isLoggedIn} setToken={setToken} />
           <Switch>
             <Route path="/viewer">
-              <ViewContainer token={token} />
+              <ViewContainer token={token} isLoggedIn={isLoggedIn} />
             </Route>
             <Route path="/about">
               <About />
