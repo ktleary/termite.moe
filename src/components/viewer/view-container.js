@@ -19,7 +19,7 @@ const Panel = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   margin: auto;
   padding: 8px;
   width: 78%;
@@ -44,9 +44,16 @@ const StoryItemWrapper = styled.div`
 const Row = styled.div`
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
+  margin: auto;
+  width: 87%;
 `;
 
-const Cell = styled.div``;
+const Cell = styled.div`
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px;
+  text-align: left;
+`;
 
 const capitalize = str => str[0].toUpperCase() + str.slice(1);
 
@@ -59,7 +66,7 @@ const normalizeItems = items => {
 const StoryItem = ({ title, item }) => {
   return (
     <Row>
-      <Cell style={{ width: 112 }}>{title}</Cell>
+      <Cell style={{ width: 112, minWidth: 112 }}>{title}</Cell>
       <Cell>
         <StoryItemWrapper>{item.join(", ")}</StoryItemWrapper>
       </Cell>
@@ -70,19 +77,33 @@ const StoryItem = ({ title, item }) => {
 const ImageItem = ({ url }) => {
   const imageExts = ["jpg", "png", "gif"];
   const isImage = imageExts.reduce(
-    (b, ext) => (!b && url && (url.indexOf(ext) > -1) ? true : b),
+    (b, ext) => (!b && url && url.indexOf(ext) > -1 ? true : b),
     false
   );
   return isImage ? <img src={url} style={{ height: 48 }} /> : url;
 };
 
+const isImage = xs => {
+  // eslint-disable-next-line fp/no-let
+  let flag = false;
+  // eslint-disable-next-line fp/no-unused-expression
+  ["gif", "jpg", "jpeg", "png"].forEach(ext => {
+    // eslint-disable-next-line fp/no-mutation
+    if (xs.indexOf(ext) > -1) flag = true;
+  });
+  return flag;
+};
+
 const ViewContainer = ({ token, isLoggedIn }) => {
   const [content, setContent] = useState();
+  const [msg, setMsg] = useState("");
   // const history = useHistory();
 
   const handleUrl = async url => {
+    // eslint-disable-next-line fp/no-unused-expression
+    setMsg("fetching results ... ");
     const storyContent = await fetchStory(url);
-    return setContent(storyContent);
+    return setContent(storyContent, setMsg(""));
   };
 
   if (!isLoggedIn) {
@@ -94,7 +115,21 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     <ViewWrapper>
       <Panel>
         <Urlbar handleUrl={handleUrl} />
-        {content && content.text ? (
+        <div>{msg}</div>
+        <Row>
+          <Cell>{content && content.siteName}</Cell>
+          <Cell>{content && content.title}</Cell>
+        </Row>
+        <Row>
+          <Cell>{content && content.byline} </Cell>
+          <Cell>
+            {content && `sentiment score: ${content.sentiments.score}`}
+          </Cell>
+        </Row>
+        <Row>
+          <Cell>{content && content.excerpt}</Cell>
+        </Row>
+        {content && content.sentences ? (
           <StoryText text={content.sentences} />
         ) : null}
         {content && content.what ? (
@@ -112,9 +147,15 @@ const ViewContainer = ({ token, isLoggedIn }) => {
         {content && content.quotes ? (
           <StoryItem title={"quotes"} item={normalizeItems(content.quotes)} />
         ) : null}
-        {content && content.urls
-          ? normalizeItems(content.urls).map(url => ImageItem(url))
-          : null}
+        <Row>
+          {content &&
+            content.urls &&
+            content.urls.filter(isImage).map((url, i) => (
+              <Cell key={`img-${i}`}>
+                <img src={url} height="100px" />
+              </Cell>
+            ))}
+        </Row>
         {content && content.emails ? (
           <StoryItem title={"emails"} item={normalizeItems(content.emails)} />
         ) : null}

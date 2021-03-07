@@ -2,15 +2,17 @@ import React from "react";
 import styled from "styled-components";
 
 const TextContainer = styled.div`
-  background: rgba(0, 0, 0, 1);
-  color: rgba(255, 255, 255, 0.66);
-  font-size: 13px;
-  max-height: 250px;
-  margin: 16px auto;
-  overflow-y: auto;
-  padding: 8px;
+  background: rgba(41, 41, 42, 1);
+  color: rgba(255, 255, 255, 0.89);
+  font-size: 16px;
+  max-height: 300px;
 
-  width: 50%;
+  margin: 16px auto;
+  min-height: 88px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  width: 78%;
 `;
 
 const Sentence = styled.div`
