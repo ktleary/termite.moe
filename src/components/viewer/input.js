@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 const Input = styled.input`
   background: rgba(32, 35, 41, 1);
-  border: 1px solid rgba(72, 72, 74, 0.6);
+  border: 1px solid rgba(61, 65, 72, .6);
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.87);
   font-size: 16px;
@@ -10,15 +10,15 @@ const Input = styled.input`
   padding: 8px;
   width: 100%;
   &:hover {
-    border: 1px solid rgba(72, 72, 74, 1);
+    border: 1px solid rgba(82,100,159, 0.6);
   }
   &:focus {
-    border: 1px solid rgba(10, 132, 255, 0.3);
+    border: 1px solid rgba(82,100,159, 1);
     outline: 0;
   }
 
   &:active {
-    border: 1px solid rgba(10, 132, 255, 0.3);
+    border: 1px solid rgba(65,79,125, 1);
     outline: 0;
   }
 `;

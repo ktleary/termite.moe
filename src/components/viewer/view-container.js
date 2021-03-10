@@ -6,8 +6,8 @@ import PropTypes from "prop-types";
 import styled from "styled-components";
 import { length } from "ramda";
 import { fetchStory } from "../../http";
-import { validateUrl } from '../../util';
-import { lenGt0, normalizeItems, rmNonAlpha } from "./helpers";
+import { validateUrl } from "../../util";
+import { lenGt0, lenKeysGt0, normalizeItems, rmNonAlpha } from "./helpers";
 import SearchBox from "./search-box";
 import StoryText from "./story-text";
 
@@ -117,7 +117,10 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   const [msg, setMsg] = useState("");
   const [url, setUrl] = useState("");
 
-  const urlValid = useMemo(() => validateUrl(url))
+  const urlValid = useMemo(() => validateUrl(url));
+  const contentAvailable = useMemo(() => lenKeysGt0(content));
+
+  console.log({ contentAvailable });
 
   const ContentContainer = styled.div`
     margin-top: 4px;
@@ -130,13 +133,6 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     const storyContent = await fetchStory(url);
     return setContent(storyContent, setMsg(""));
   };
-
-  // const handleUrl = async url => {
-  //   // eslint-disable-next-line fp/no-unused-expression
-  //   setMsg("fetching results ... ");
-  //   const storyContent = await fetchStory(url);
-  //   return setContent(storyContent, setMsg(""));
-  // };
 
   if (!isLoggedIn) {
     // eslint-disable-next-line fp/no-mutating-methods, fp/no-unused-expression
@@ -153,6 +149,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             handleSubmit={handleSubmit}
             url={url}
             urlValid={urlValid}
+            contentAvailable={contentAvailable}
             data-testid="quick-input"
           />
           <Row>
@@ -171,6 +168,8 @@ const ViewContainer = ({ token, isLoggedIn }) => {
           handleChange={handleChange}
           handleClose={handleClose}
           handleSubmit={handleSubmit}
+          urlValid={urlValid}
+          contentAvailable={contentAvailable}
           url={url}
           data-testid="quick-input"
         />

@@ -28,23 +28,25 @@ const ViewSubmitButton = styled(SubmitButton)`
 `;
 
 const SearchWrapper = styled.div`
+  margin-top: ${({ contentAvailable }) => (contentAvailable ? "16px" : "25%")};
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+
   display: flex;
   justify-content: center;
-  margin-top: 25%;
   width: 100%;
 `;
 
 const SearchBox = ({
+  contentAvailable,
   handleChange,
   handleClose,
   handleSubmit,
   url,
   urlValid,
 }) => {
+
   return (
-    <SearchWrapper>
+    <SearchWrapper contentAvailable={contentAvailable}>
       <InputContainer>
         <Input
           onChange={handleChange}
@@ -61,7 +63,7 @@ const SearchBox = ({
         <ViewCloseButton disabled={lenLt0(url)} />
       </ButtonHolder>
       <ButtonHolder>
-        <ViewSubmitButton disabled={not(urlValid)} onClick={handleSubmit} />
+        <ViewSubmitButton disabled={not(urlValid)} handleClick={handleSubmit} />
       </ButtonHolder>
     </SearchWrapper>
   );
@@ -76,4 +78,5 @@ SearchBox.propTypes = {
   handleSubmit: PropTypes.func,
   url: PropTypes.string,
   urlValid: PropTypes.bool,
+  contentAvailable: PropTypes.bool,
 };

@@ -1,4 +1,4 @@
-import { compose, gt, length, lte, map, trim } from "ramda";
+import { compose, gt, keys, length, lte, map, trim } from "ramda";
 import { capitalize } from "../../util";
 
 const gt0 = xn => gt(xn, 0);
@@ -17,6 +17,9 @@ const normalizeItems = items =>
 const lte0 = xn => lte(xn, 0);
 const lenLt0 = compose(lte0, length);
 
+const lenKeys = compose(length, keys);
+const lenKeysGt0 = compose(gt0, lenKeys);
+
 // eslint-disable-next-line fp/no-mutation
 export {
   gt0,
@@ -26,6 +29,7 @@ export {
   alphaTrimCapitalize,
   lte0,
   lenLt0,
+  lenKeysGt0,
   uniqList,
   capitalizeAlphaList,
   uniqCapitalized,
