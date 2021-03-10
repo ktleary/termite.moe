@@ -18,19 +18,10 @@ const Main = styled.main`
   padding: 0;
 `;
 
-const checkAuth = token => {
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log({ token });
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log({ gt1: R.length(R.toString(token)) });
-  return R.gt(R.length(token), 1);
-};
+const checkAuth = token => R.gt(R.length(token), 1);
 
 function App() {
   const { token, setToken } = useToken();
-
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log(token);
   const isLoggedIn = useMemo(() => checkAuth(token));
 
   return (

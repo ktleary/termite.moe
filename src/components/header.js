@@ -37,8 +37,6 @@ const NavLink = styled(Link)`
 
 const Header = ({ setToken, isLoggedIn }) => {
   const { pathname } = useLocation();
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log({ isLoggedIn });
   return pathname === "/viewer" ? (
     <ViewHeader setToken={setToken} />
   ) : (

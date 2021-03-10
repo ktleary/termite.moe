@@ -1,13 +1,12 @@
 /* eslint-disable fp/no-nil */
-
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-// import * as R from "ramda";
-// import { useHistory } from "react-router-dom";
+import { length } from "ramda";
+import { fetchStory } from "../../http";
+import { lenGt0, normalizeItems, rmNonAlpha } from "./helpers";
 import Urlbar from "./urlbar";
 import StoryText from "./story-text";
-import { endpoint } from "../../env/configure-endpoint";
 
 const ViewWrapper = styled.div`
   max-width: 1100px;
@@ -19,58 +18,77 @@ const Panel = styled.div`
   border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   height: 100%;
   margin: auto;
+  min-height: 100vw;
   padding: 8px;
   width: 78%;
 `;
 
-async function fetchStory(url) {
-  const endpointUrl = endpoint.concat("/story?");
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log(endpointUrl);
-  return fetch(
-    endpointUrl +
-      new URLSearchParams({
-        url,
-      })
-  ).then(data => data.json());
-}
-
-const StoryItemWrapper = styled.div`
-  padding: 16px;
-`;
-
 const Row = styled.div`
   align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-wrap: wrap;
-  margin: auto;
+  margin: 8px auto;
   width: 87%;
 `;
 
 const Cell = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 8px;
   text-align: left;
 `;
 
-const capitalize = str => str[0].toUpperCase() + str.slice(1);
+const NoContent = () => <Cell>Nothing found.</Cell>;
 
-const normalizeItems = items => {
-  if (!Array.isArray(items)) return items;
-  // eslint-disable-next-line fp/no-mutating-methods
-  return [...new Set(items.map(i => capitalize(i)))].sort();
-};
+const StoryItemTitle = styled(Cell)`
+  color: rgba(255, 255, 255, 1);
+  min-width: 112;
+  font-weight: 600;
+  width: 100%;
+`;
 
-const StoryItem = ({ title, item }) => {
+const StoryItemCell = styled(Cell)`
+  background-color: rgba(27, 27, 28, 1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+  padding: 4px;
+  margin: 4px;
+`;
+
+const StoryTitle = styled(Cell)`
+  color: rgba(255, 255, 255, 1);
+  font-size: 20px;
+`;
+
+const MessageWrapper = styled(Cell)`
+  align-self: center;
+  color: rgba(187, 134, 252, 1);
+  height: 32px;
+  font-size: 20px;
+  text-align: center;
+  width: 100%;
+`;
+
+const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
+
+const SentimentScoreDisplay = styled.span`
+  color: ${({ score }) =>
+    score >= 0 ? "rgba(2, 218, 197, 0.87)" : "rgba(255, 65, 129, 0.87)"};
+  font-size: 90%;
+`;
+
+const Span = styled.span``;
+
+const SentimentScore = ({ score }) => {
   return (
-    <Row>
-      <Cell style={{ width: 112, minWidth: 112 }}>{title}</Cell>
-      <Cell>
-        <StoryItemWrapper>{item.join(", ")}</StoryItemWrapper>
-      </Cell>
-    </Row>
+    <Cell>
+      <Span>sentiment score: </Span>
+      <SentimentScoreDisplay score={score}>{score}</SentimentScoreDisplay>
+    </Cell>
   );
 };
 
@@ -99,6 +117,10 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   const [msg, setMsg] = useState("");
   // const history = useHistory();
 
+  const ContentContainer = styled.div`
+    margin-top: 4px;
+  `;
+
   const handleUrl = async url => {
     // eslint-disable-next-line fp/no-unused-expression
     setMsg("fetching results ... ");
@@ -111,54 +133,121 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     return <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>;
   }
 
+  if (!content)
+    return (
+      <ViewWrapper>
+        <Panel>
+          <Urlbar handleUrl={handleUrl} />
+          <Row>
+            <MessageWrapper>{msg}</MessageWrapper>
+          </Row>
+        </Panel>
+      </ViewWrapper>
+    );
+
+  const { siteName, title } = content && content;
+
   return (
     <ViewWrapper>
       <Panel>
         <Urlbar handleUrl={handleUrl} />
-        <div>{msg}</div>
-        <Row>
-          <Cell>{content && content.siteName}</Cell>
-          <Cell>{content && content.title}</Cell>
-        </Row>
-        <Row>
-          <Cell>{content && content.byline} </Cell>
-          <Cell>
-            {content && `sentiment score: ${content.sentiments.score}`}
-          </Cell>
-        </Row>
-        <Row>
-          <Cell>{content && content.excerpt}</Cell>
-        </Row>
-        {content && content.sentences ? (
-          <StoryText text={content.sentences} />
+        {msg.length ? (
+          <Row>
+            <MessageWrapper>{msg}</MessageWrapper>
+          </Row>
         ) : null}
-        {content && content.what ? (
-          <StoryItem title={"what"} item={normalizeItems(content.what)} />
-        ) : null}
-        {content && content.who ? (
-          <StoryItem title={"who"} item={normalizeItems(content.who)} />
-        ) : null}
-        {content && content.who ? (
-          <StoryItem title={"where"} item={normalizeItems(content.where)} />
-        ) : null}
-        {content && content.when ? (
-          <StoryItem title={"when"} item={normalizeItems(content.when)} />
-        ) : null}
-        {content && content.quotes ? (
-          <StoryItem title={"quotes"} item={normalizeItems(content.quotes)} />
-        ) : null}
-        <Row>
-          {content &&
-            content.urls &&
-            content.urls.filter(isImage).map((url, i) => (
-              <Cell key={`img-${i}`}>
-                <img src={url} height="100px" />
-              </Cell>
-            ))}
-        </Row>
-        {content && content.emails ? (
-          <StoryItem title={"emails"} item={normalizeItems(content.emails)} />
-        ) : null}
+        {Object.keys(content).length && (
+          <ContentContainer>
+            <Row>
+              {length(siteName) && <Cell>{siteName}</Cell>}
+              {length(title) && <StoryTitle>{title}</StoryTitle>}
+            </Row>
+            <Row>
+              <Cell>{content && content.byline} </Cell>
+              <Cell>{content && `wordcount: ${content.wordcount}`}</Cell>
+              {content && content.sentiments && <SentimentScore score={content.sentiments.score} />}
+            </Row>
+            <Row>
+              <Cell>{content && content.excerpt}</Cell>
+            </Row>
+            {content && content.sentences ? (
+              <StoryText text={content.sentences} />
+            ) : null}
+            <Row>
+              <StoryItemTitle>What: </StoryItemTitle>
+              {content &&
+                content.what &&
+                normalizeItems(content.what).map((item, i) => (
+                  <StoryItem key={`storyitem-what-${i}`} item={item} />
+                ))}
+            </Row>
+            <Row>
+              <StoryItemTitle>Who: </StoryItemTitle>
+              {content && lenGt0(content.who) ? (
+                normalizeItems(content.who).map((item, i) => (
+                  <StoryItem key={`storyitem-who-${i}`} item={item} />
+                ))
+              ) : (
+                <NoContent />
+              )}
+            </Row>
+            <Row>
+              <StoryItemTitle>Where: </StoryItemTitle>
+              {content && lenGt0(content.where) ? (
+                normalizeItems(content.where).map((item, i) => (
+                  <StoryItem key={`storyitem-where-${i}`} item={item} />
+                ))
+              ) : (
+                <NoContent />
+              )}
+            </Row>
+            <Row>
+              <StoryItemTitle>When: </StoryItemTitle>
+              {content &&
+                content.when &&
+                normalizeItems(content.when).map((item, i) => (
+                  <StoryItem key={`storyitem-when-${i}`} item={item} />
+                ))}
+            </Row>
+            <Row>
+              <StoryItemTitle>In Quotes: </StoryItemTitle>
+              {content &&
+                content.quotes &&
+                normalizeItems(content.quotes)
+                  .map(item => `"${item}"`)
+                  .map((item, i) => (
+                    <StoryItem key={`storyitem-quote-${i}`} item={item} />
+                  ))}
+            </Row>
+
+            <Row>
+              <StoryItemTitle>Numbers: </StoryItemTitle>
+              {content &&
+                content.numbers &&
+                content.numbers
+                  .map(i => i.text.toString())
+                  .map(rmNonAlpha)
+                  .map((n, i) => <StoryItem key={`numbers-${i}}`} item={n} />)}
+            </Row>
+            <Row>
+              {content &&
+                content.urls &&
+                content.urls.filter(isImage).map((url, i) => (
+                  <Cell key={`img-${i}`}>
+                    <img src={url} height="200px" />
+                  </Cell>
+                ))}
+            </Row>
+            <Row>
+              <StoryItemTitle>Mentions: </StoryItemTitle>
+              {content &&
+                content.mentions &&
+                content.mentions.map((n, i) => (
+                  <StoryItem key={`numbers-${i}}`} item={n} />
+                ))}
+            </Row>
+          </ContentContainer>
+        )}
       </Panel>
     </ViewWrapper>
   );
@@ -182,4 +271,9 @@ StoryItem.propTypes = {
 // eslint-disable-next-line fp/no-mutation
 ImageItem.propTypes = {
   url: PropTypes.string,
+};
+
+// eslint-disable-next-line fp/no-mutation
+SentimentScore.propTypes = {
+  score: PropTypes.number,
 };
