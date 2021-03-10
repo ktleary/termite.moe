@@ -19,12 +19,18 @@ const Logo = styled.div`
 `;
 const Nav = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: flex-start;
   width: 100%;
 `;
 
 const NavItem = styled.div`
-  padding: 8px;
+  width: 100%;
+`;
+
+const SignOut = styled(NavItem)`
+  padding-right: 16px;
+  text-align: right;
+
 `;
 
 const NavLink = styled(Link)`
@@ -54,9 +60,9 @@ const ViewHeader = ({ setToken }) => {
       </Logo>
       <Nav>
         <NavItem>
-          <NavLink to="/" onClick={handleSignOut}>
+          <SignOut to="/" onClick={handleSignOut}>
             Sign Out
-          </NavLink>
+          </SignOut>
         </NavItem>
       </Nav>
     </HeaderContainer>

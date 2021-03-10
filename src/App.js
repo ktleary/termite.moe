@@ -13,9 +13,14 @@ import useToken from "./components/auth/useToken";
 import Header from "./components/header";
 
 const Main = styled.main`
-  margin: auto;
+  margin: 0 auto;
   max-width: 1100px;
   padding: 0;
+`;
+
+const AppWrapper = styled.div`
+  max-width: 1100px;
+  width: 100%;
 `;
 
 const checkAuth = token => R.gt(R.length(token), 1);
@@ -25,7 +30,7 @@ function App() {
   const isLoggedIn = useMemo(() => checkAuth(token));
 
   return (
-    <div clasname="App">
+    <AppWrapper>
       <Helmet>
         <html lang="en" />
         <title>Beetz Home</title>
@@ -50,7 +55,7 @@ function App() {
           </Switch>
         </Main>
       </Router>
-    </div>
+    </AppWrapper>
   );
 }
 

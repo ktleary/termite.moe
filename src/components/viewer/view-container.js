@@ -1,11 +1,14 @@
 /* eslint-disable fp/no-nil */
-import React, { useState } from "react";
+/* eslint-disable fp/no-unused-expression */
+
+import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { length } from "ramda";
 import { fetchStory } from "../../http";
+import { validateUrl } from '../../util';
 import { lenGt0, normalizeItems, rmNonAlpha } from "./helpers";
-import Urlbar from "./urlbar";
+import SearchBox from "./search-box";
 import StoryText from "./story-text";
 
 const ViewWrapper = styled.div`
@@ -14,8 +17,7 @@ const ViewWrapper = styled.div`
 `;
 
 const Panel = styled.div`
-  background-color: rgba(18, 18, 19, 1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(40, 44, 52, 0.33);
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -28,7 +30,6 @@ const Panel = styled.div`
 
 const Row = styled.div`
   align-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-wrap: wrap;
   margin: 8px auto;
@@ -104,7 +105,6 @@ const ImageItem = ({ url }) => {
 const isImage = xs => {
   // eslint-disable-next-line fp/no-let
   let flag = false;
-  // eslint-disable-next-line fp/no-unused-expression
   ["gif", "jpg", "jpeg", "png"].forEach(ext => {
     // eslint-disable-next-line fp/no-mutation
     if (xs.indexOf(ext) > -1) flag = true;
@@ -115,18 +115,28 @@ const isImage = xs => {
 const ViewContainer = ({ token, isLoggedIn }) => {
   const [content, setContent] = useState();
   const [msg, setMsg] = useState("");
-  // const history = useHistory();
+  const [url, setUrl] = useState("");
+
+  const urlValid = useMemo(() => validateUrl(url))
 
   const ContentContainer = styled.div`
     margin-top: 4px;
   `;
 
-  const handleUrl = async url => {
-    // eslint-disable-next-line fp/no-unused-expression
+  const handleChange = e => setUrl(e.target.value);
+  const handleClose = () => setUrl("");
+  const handleSubmit = async () => {
     setMsg("fetching results ... ");
     const storyContent = await fetchStory(url);
     return setContent(storyContent, setMsg(""));
   };
+
+  // const handleUrl = async url => {
+  //   // eslint-disable-next-line fp/no-unused-expression
+  //   setMsg("fetching results ... ");
+  //   const storyContent = await fetchStory(url);
+  //   return setContent(storyContent, setMsg(""));
+  // };
 
   if (!isLoggedIn) {
     // eslint-disable-next-line fp/no-mutating-methods, fp/no-unused-expression
@@ -137,7 +147,14 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     return (
       <ViewWrapper>
         <Panel>
-          <Urlbar handleUrl={handleUrl} />
+          <SearchBox
+            handleChange={handleChange}
+            handleClose={handleClose}
+            handleSubmit={handleSubmit}
+            url={url}
+            urlValid={urlValid}
+            data-testid="quick-input"
+          />
           <Row>
             <MessageWrapper>{msg}</MessageWrapper>
           </Row>
@@ -150,7 +167,13 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   return (
     <ViewWrapper>
       <Panel>
-        <Urlbar handleUrl={handleUrl} />
+        <SearchBox
+          handleChange={handleChange}
+          handleClose={handleClose}
+          handleSubmit={handleSubmit}
+          url={url}
+          data-testid="quick-input"
+        />
         {msg.length ? (
           <Row>
             <MessageWrapper>{msg}</MessageWrapper>
@@ -165,7 +188,9 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             <Row>
               <Cell>{content && content.byline} </Cell>
               <Cell>{content && `wordcount: ${content.wordcount}`}</Cell>
-              {content && content.sentiments && <SentimentScore score={content.sentiments.score} />}
+              {content && content.sentiments && (
+                <SentimentScore score={content.sentiments.score} />
+              )}
             </Row>
             <Row>
               <Cell>{content && content.excerpt}</Cell>
