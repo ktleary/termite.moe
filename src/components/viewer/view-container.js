@@ -4,7 +4,7 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { length } from "ramda";
+import { prop, toString } from "ramda";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
 import { lenGt0, lenKeysGt0, normalizeItems, rmNonAlpha } from "./helpers";
@@ -33,7 +33,6 @@ const Row = styled.div`
   display: flex;
   flex-wrap: wrap;
   margin: 8px auto;
-  width: 87%;
 `;
 
 const Cell = styled.div`
@@ -45,13 +44,12 @@ const NoContent = () => <Cell>Nothing found.</Cell>;
 
 const StoryItemTitle = styled(Cell)`
   color: rgba(255, 255, 255, 1);
-  min-width: 112;
+  min-width: 112px;
   font-weight: 600;
-  width: 100%;
 `;
 
 const StoryItemCell = styled(Cell)`
-  background-color: rgba(27, 27, 28, 1);
+  background-color: rgba(61, 65, 72, 1);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 4px;
   color: rgba(255, 255, 255, 0.78);
@@ -76,20 +74,25 @@ const MessageWrapper = styled(Cell)`
 
 const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
 
-const SentimentScoreDisplay = styled.span`
+const SentimentScoreDisplay = styled.div`
   color: ${({ score }) =>
     score >= 0 ? "rgba(2, 218, 197, 0.87)" : "rgba(255, 65, 129, 0.87)"};
-  font-size: 90%;
+  font-size: 100%;
 `;
 
-const Span = styled.span``;
+const sentimentScore = sentiments => prop("score", sentiments);
+
+const SentimentWrapper = styled.div`
+  align-items: center;
+  display: flex;
+`;
 
 const SentimentScore = ({ score }) => {
   return (
-    <Cell>
-      <Span>sentiment score: </Span>
+    <SentimentWrapper>
+      <Cell>sentiment score: </Cell>
       <SentimentScoreDisplay score={score}>{score}</SentimentScoreDisplay>
-    </Cell>
+    </SentimentWrapper>
   );
 };
 
@@ -112,15 +115,42 @@ const isImage = xs => {
   return flag;
 };
 
+
+const CategoryRow = styled(Row)`
+  border-bottom: 1px solid rgba(62, 65, 72, 0.5);
+  padding-bottom: 8px;
+  width: 100%;
+`
+
+const StoryItemCategory = ({ title, content }) =>
+  content ? (
+    <CategoryRow>
+      <StoryItemTitle>{title}</StoryItemTitle>
+      {normalizeItems(content).map((item, i) => (
+        <StoryItem key={`storyitem-${title}-${i}`} item={item} />
+      ))}
+    </CategoryRow>
+  ) : (
+    <NoContent />
+  );
+
+const SiteName = ({ name }) => (lenGt0(name) ? <Cell>{name}</Cell> : null);
+
+const Title = ({ title }) =>
+  lenGt0(title) ? <StoryTitle>{title}</StoryTitle> : null;
+
+const ContentItem = ({ itemContent }) =>
+  lenGt0(itemContent) ? <Cell>{itemContent}</Cell> : null;
+
+// -- Main -------
 const ViewContainer = ({ token, isLoggedIn }) => {
+  // -- State ------
   const [content, setContent] = useState();
   const [msg, setMsg] = useState("");
   const [url, setUrl] = useState("");
 
   const urlValid = useMemo(() => validateUrl(url));
   const contentAvailable = useMemo(() => lenKeysGt0(content));
-
-  console.log({ contentAvailable });
 
   const ContentContainer = styled.div`
     margin-top: 4px;
@@ -139,28 +169,6 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     return <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>;
   }
 
-  if (!content)
-    return (
-      <ViewWrapper>
-        <Panel>
-          <SearchBox
-            handleChange={handleChange}
-            handleClose={handleClose}
-            handleSubmit={handleSubmit}
-            url={url}
-            urlValid={urlValid}
-            contentAvailable={contentAvailable}
-            data-testid="quick-input"
-          />
-          <Row>
-            <MessageWrapper>{msg}</MessageWrapper>
-          </Row>
-        </Panel>
-      </ViewWrapper>
-    );
-
-  const { siteName, title } = content && content;
-
   return (
     <ViewWrapper>
       <Panel>
@@ -178,33 +186,26 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             <MessageWrapper>{msg}</MessageWrapper>
           </Row>
         ) : null}
-        {Object.keys(content).length && (
+
+        {contentAvailable && (
           <ContentContainer>
             <Row>
-              {length(siteName) && <Cell>{siteName}</Cell>}
-              {length(title) && <StoryTitle>{title}</StoryTitle>}
+              <SiteName name={prop("siteName", content)} />
+              <Title title={prop("title", content)} />
             </Row>
             <Row>
-              <Cell>{content && content.byline} </Cell>
-              <Cell>{content && `wordcount: ${content.wordcount}`}</Cell>
-              {content && content.sentiments && (
-                <SentimentScore score={content.sentiments.score} />
-              )}
+              <ContentItem itemContent={prop("byline", content)} /> wordcount{" "}
+              <ContentItem itemContent={toString(prop("wordcount", content))} />
+              <SentimentScore
+                score={sentimentScore(prop("sentiments", content))}
+              />
             </Row>
             <Row>
-              <Cell>{content && content.excerpt}</Cell>
+              <ContentItem itemContent={prop("excerpt", content)} />
             </Row>
-            {content && content.sentences ? (
-              <StoryText text={content.sentences} />
-            ) : null}
-            <Row>
-              <StoryItemTitle>What: </StoryItemTitle>
-              {content &&
-                content.what &&
-                normalizeItems(content.what).map((item, i) => (
-                  <StoryItem key={`storyitem-what-${i}`} item={item} />
-                ))}
-            </Row>
+
+            <StoryItemCategory title={"what"} content={prop("what", content)} />
+
             <Row>
               <StoryItemTitle>Who: </StoryItemTitle>
               {content && lenGt0(content.who) ? (
@@ -270,6 +271,9 @@ const ViewContainer = ({ token, isLoggedIn }) => {
                   <StoryItem key={`numbers-${i}}`} item={n} />
                 ))}
             </Row>
+            {content && content.sentences ? (
+              <StoryText text={content.sentences} />
+            ) : null}
           </ContentContainer>
         )}
       </Panel>
@@ -300,4 +304,25 @@ ImageItem.propTypes = {
 // eslint-disable-next-line fp/no-mutation
 SentimentScore.propTypes = {
   score: PropTypes.number,
+};
+
+// eslint-disable-next-line fp/no-mutation
+SiteName.propTypes = {
+  name: PropTypes.string,
+};
+
+// eslint-disable-next-line fp/no-mutation
+Title.propTypes = {
+  title: PropTypes.string,
+};
+
+// eslint-disable-next-line fp/no-mutation
+ContentItem.propTypes = {
+  itemContent: PropTypes.string,
+};
+
+// eslint-disable-next-line fp/no-mutation
+StoryItemCategory.propTypes = {
+  title: PropTypes.string,
+  content: PropTypes.string,
 };
