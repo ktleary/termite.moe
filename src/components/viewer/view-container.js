@@ -4,7 +4,7 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { prop, toString } from "ramda";
+import { equals, prop, toString } from "ramda";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
 import { lenGt0, lenKeysGt0, normalizeItems, rmNonAlpha } from "./helpers";
@@ -46,6 +46,7 @@ const StoryItemTitle = styled(Cell)`
   color: rgba(255, 255, 255, 1);
   min-width: 112px;
   font-weight: 600;
+  width: 100%;
 `;
 
 const StoryItemCell = styled(Cell)`
@@ -115,24 +116,30 @@ const isImage = xs => {
   return flag;
 };
 
-
 const CategoryRow = styled(Row)`
   border-bottom: 1px solid rgba(62, 65, 72, 0.5);
   padding-bottom: 8px;
   width: 100%;
-`
+`;
 
-const StoryItemCategory = ({ title, content }) =>
-  content ? (
-    <CategoryRow>
-      <StoryItemTitle>{title}</StoryItemTitle>
-      {normalizeItems(content).map((item, i) => (
-        <StoryItem key={`storyitem-${title}-${i}`} item={item} />
-      ))}
-    </CategoryRow>
-  ) : (
-    <NoContent />
-  );
+const processItem = (title, item) =>
+  equals(title, "In Quotes") ? `"${item}"` : item;
+
+const StoryItemCategory = ({ title, content }) => (
+  <CategoryRow>
+    <StoryItemTitle>{title}</StoryItemTitle>
+    {lenGt0(content) ? (
+      normalizeItems(content).map((item, i) => (
+        <StoryItem
+          key={`storyitem-${title}-${i}`}
+          item={processItem(title, item)}
+        />
+      ))
+    ) : (
+      <NoContent />
+    )}
+  </CategoryRow>
+);
 
 const SiteName = ({ name }) => (lenGt0(name) ? <Cell>{name}</Cell> : null);
 
@@ -204,46 +211,29 @@ const ViewContainer = ({ token, isLoggedIn }) => {
               <ContentItem itemContent={prop("excerpt", content)} />
             </Row>
 
-            <StoryItemCategory title={"what"} content={prop("what", content)} />
+            <StoryItemCategory
+              title={"What"}
+              content={prop("what", content)}
+            />
 
-            <Row>
-              <StoryItemTitle>Who: </StoryItemTitle>
-              {content && lenGt0(content.who) ? (
-                normalizeItems(content.who).map((item, i) => (
-                  <StoryItem key={`storyitem-who-${i}`} item={item} />
-                ))
-              ) : (
-                <NoContent />
-              )}
-            </Row>
-            <Row>
-              <StoryItemTitle>Where: </StoryItemTitle>
-              {content && lenGt0(content.where) ? (
-                normalizeItems(content.where).map((item, i) => (
-                  <StoryItem key={`storyitem-where-${i}`} item={item} />
-                ))
-              ) : (
-                <NoContent />
-              )}
-            </Row>
-            <Row>
-              <StoryItemTitle>When: </StoryItemTitle>
-              {content &&
-                content.when &&
-                normalizeItems(content.when).map((item, i) => (
-                  <StoryItem key={`storyitem-when-${i}`} item={item} />
-                ))}
-            </Row>
-            <Row>
-              <StoryItemTitle>In Quotes: </StoryItemTitle>
-              {content &&
-                content.quotes &&
-                normalizeItems(content.quotes)
-                  .map(item => `"${item}"`)
-                  .map((item, i) => (
-                    <StoryItem key={`storyitem-quote-${i}`} item={item} />
-                  ))}
-            </Row>
+            <StoryItemCategory title={"Who"} content={prop("who", content)} />
+
+            <StoryItemCategory
+              title={"Where: "}
+              content={prop("where", content)}
+            />
+
+            <StoryItemCategory
+              title={"When"}
+              content={prop("when", content)}
+            />
+
+            <StoryItemCategory
+              title={"In Quotes"}
+              content={prop("quotes", content)}
+            />
+
+
 
             <Row>
               <StoryItemTitle>Numbers: </StoryItemTitle>
