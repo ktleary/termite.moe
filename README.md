@@ -1,4 +1,4 @@
-# Source Lifter
+# beetz
 
 Extract source materials from text
 
