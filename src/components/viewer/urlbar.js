@@ -27,7 +27,6 @@ const Urlbar = ({ handleUrl }) => {
             name="urlbar"
             placeholder="URL"
             onChange={handleChange}
-
           />
         </InputContainer>
       </UrlForm>

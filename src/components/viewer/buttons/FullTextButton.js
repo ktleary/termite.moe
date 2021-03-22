@@ -37,6 +37,6 @@ const FullTextButton = ({ disabled, handleClick }) => (
 export default FullTextButton;
 // eslint-disable-next-line fp/no-mutation
 FullTextButton.propTypes = {
-  handleClick: PropTypes.bool,
+  handleClick: PropTypes.func,
   disabled: PropTypes.bool,
 };

@@ -4,7 +4,7 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { equals, prop, toString } from "ramda";
+import { equals, gt, indexOf, prop, toString } from "ramda";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
 import { lenGt0, lenKeysGt0, normalizeItems, rmNonAlpha } from "./helpers";
@@ -40,7 +40,11 @@ const Cell = styled.div`
   text-align: left;
 `;
 
-const NoContent = () => <Cell>Nothing found.</Cell>;
+const CategoryRow = styled(Row)`
+  border-bottom: 1px solid rgba(62, 65, 72, 0.5);
+  padding-bottom: 8px;
+  width: 100%;
+`;
 
 const StoryItemTitle = styled(Cell)`
   color: rgba(255, 255, 255, 1);
@@ -73,20 +77,25 @@ const MessageWrapper = styled(Cell)`
   width: 100%;
 `;
 
-const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
-
 const SentimentScoreDisplay = styled.div`
   color: ${({ score }) =>
     score >= 0 ? "rgba(2, 218, 197, 0.87)" : "rgba(255, 65, 129, 0.87)"};
   font-size: 100%;
 `;
 
-const sentimentScore = sentiments => prop("score", sentiments);
-
 const SentimentWrapper = styled.div`
   align-items: center;
   display: flex;
 `;
+
+const ContentContainer = styled.div`
+  margin-top: 4px;
+`;
+
+const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
+const NoContent = () => <Cell>Nothing found.</Cell>;
+
+const sentimentScore = sentiments => prop("score", sentiments);
 
 const SentimentScore = ({ score }) => {
   return (
@@ -106,6 +115,9 @@ const ImageItem = ({ url }) => {
   return isImage ? <img src={url} style={{ height: 48 }} /> : url;
 };
 
+const qualifyImageUrl = url =>
+  gt(indexOf("http", url), -1) ? url : "https://".concat(url);
+
 const isImage = xs => {
   // eslint-disable-next-line fp/no-let
   let flag = false;
@@ -115,12 +127,6 @@ const isImage = xs => {
   });
   return flag;
 };
-
-const CategoryRow = styled(Row)`
-  border-bottom: 1px solid rgba(62, 65, 72, 0.5);
-  padding-bottom: 8px;
-  width: 100%;
-`;
 
 const processItem = (title, item) =>
   equals(title, "In Quotes") ? `"${item}"` : item;
@@ -158,10 +164,6 @@ const ViewContainer = ({ token, isLoggedIn }) => {
 
   const urlValid = useMemo(() => validateUrl(url));
   const contentAvailable = useMemo(() => lenKeysGt0(content));
-
-  const ContentContainer = styled.div`
-    margin-top: 4px;
-  `;
 
   const handleChange = e => setUrl(e.target.value);
   const handleClose = () => setUrl("");
@@ -211,10 +213,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
               <ContentItem itemContent={prop("excerpt", content)} />
             </Row>
 
-            <StoryItemCategory
-              title={"What"}
-              content={prop("what", content)}
-            />
+            <StoryItemCategory title={"What"} content={prop("what", content)} />
 
             <StoryItemCategory title={"Who"} content={prop("who", content)} />
 
@@ -223,17 +222,12 @@ const ViewContainer = ({ token, isLoggedIn }) => {
               content={prop("where", content)}
             />
 
-            <StoryItemCategory
-              title={"When"}
-              content={prop("when", content)}
-            />
+            <StoryItemCategory title={"When"} content={prop("when", content)} />
 
             <StoryItemCategory
               title={"In Quotes"}
               content={prop("quotes", content)}
             />
-
-
 
             <Row>
               <StoryItemTitle>Numbers: </StoryItemTitle>
@@ -247,11 +241,15 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             <Row>
               {content &&
                 content.urls &&
-                content.urls.filter(isImage).map((url, i) => (
-                  <Cell key={`img-${i}`}>
-                    <img src={url} height="200px" />
-                  </Cell>
-                ))}
+                content.urls.map(qualifyImageUrl).map((url, i) =>
+                  isImage(url) ? (
+                    <Cell key={`img-${i}`}>
+                      <img src={url} height="200px" />
+                    </Cell>
+                  ) : (
+                    <Cell key={`img-${i}`}>{url}</Cell>
+                  )
+                )}
             </Row>
             <Row>
               <StoryItemTitle>Mentions: </StoryItemTitle>
@@ -314,5 +312,5 @@ ContentItem.propTypes = {
 // eslint-disable-next-line fp/no-mutation
 StoryItemCategory.propTypes = {
   title: PropTypes.string,
-  content: PropTypes.string,
+  content: PropTypes.array,
 };
