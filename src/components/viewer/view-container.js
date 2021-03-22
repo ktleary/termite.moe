@@ -4,12 +4,18 @@
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { equals, gt, indexOf, prop, toString } from "ramda";
+import { gt, indexOf, prop, toString } from "ramda";
+import { Cell, Row } from "./grid";
+import StoryItem from "./story-item";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
-import { lenGt0, lenKeysGt0, normalizeItems, rmNonAlpha } from "./helpers";
+import { lenGt0, lenKeysGt0, rmNonAlpha } from "./helpers";
+import ContentItem from './content-item';
 import SearchBox from "./search-box";
+import StoryItemCategory from "./story-item-category";
 import StoryText from "./story-text";
+import Title from './title';
+import { StoryItemTitle } from "./story-style";
 
 const ViewWrapper = styled.div`
   max-width: 1100px;
@@ -28,45 +34,7 @@ const Panel = styled.div`
   width: 78%;
 `;
 
-const Row = styled.div`
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  margin: 8px auto;
-`;
 
-const Cell = styled.div`
-  padding: 8px;
-  text-align: left;
-`;
-
-const CategoryRow = styled(Row)`
-  border-bottom: 1px solid rgba(62, 65, 72, 0.5);
-  padding-bottom: 8px;
-  width: 100%;
-`;
-
-const StoryItemTitle = styled(Cell)`
-  color: rgba(255, 255, 255, 1);
-  min-width: 112px;
-  font-weight: 600;
-  width: 100%;
-`;
-
-const StoryItemCell = styled(Cell)`
-  background-color: rgba(61, 65, 72, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 14px;
-  padding: 4px;
-  margin: 4px;
-`;
-
-const StoryTitle = styled(Cell)`
-  color: rgba(255, 255, 255, 1);
-  font-size: 20px;
-`;
 
 const MessageWrapper = styled(Cell)`
   align-self: center;
@@ -91,9 +59,6 @@ const SentimentWrapper = styled.div`
 const ContentContainer = styled.div`
   margin-top: 4px;
 `;
-
-const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
-const NoContent = () => <Cell>Nothing found.</Cell>;
 
 const sentimentScore = sentiments => prop("score", sentiments);
 
@@ -128,32 +93,10 @@ const isImage = xs => {
   return flag;
 };
 
-const processItem = (title, item) =>
-  equals(title, "In Quotes") ? `"${item}"` : item;
-
-const StoryItemCategory = ({ title, content }) => (
-  <CategoryRow>
-    <StoryItemTitle>{title}</StoryItemTitle>
-    {lenGt0(content) ? (
-      normalizeItems(content).map((item, i) => (
-        <StoryItem
-          key={`storyitem-${title}-${i}`}
-          item={processItem(title, item)}
-        />
-      ))
-    ) : (
-      <NoContent />
-    )}
-  </CategoryRow>
-);
-
 const SiteName = ({ name }) => (lenGt0(name) ? <Cell>{name}</Cell> : null);
 
-const Title = ({ title }) =>
-  lenGt0(title) ? <StoryTitle>{title}</StoryTitle> : null;
 
-const ContentItem = ({ itemContent }) =>
-  lenGt0(itemContent) ? <Cell>{itemContent}</Cell> : null;
+
 
 // -- Main -------
 const ViewContainer = ({ token, isLoggedIn }) => {
@@ -173,12 +116,9 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     return setContent(storyContent, setMsg(""));
   };
 
-  if (!isLoggedIn) {
-    // eslint-disable-next-line fp/no-mutating-methods, fp/no-unused-expression
-    return <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>;
-  }
-
-  return (
+  return !isLoggedIn ? (
+    <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>
+  ) : (
     <ViewWrapper>
       <Panel>
         <SearchBox
@@ -279,12 +219,6 @@ ViewContainer.propTypes = {
 };
 
 // eslint-disable-next-line fp/no-mutation
-StoryItem.propTypes = {
-  item: PropTypes.any,
-  title: PropTypes.string,
-};
-
-// eslint-disable-next-line fp/no-mutation
 ImageItem.propTypes = {
   url: PropTypes.string,
 };
@@ -299,18 +233,3 @@ SiteName.propTypes = {
   name: PropTypes.string,
 };
 
-// eslint-disable-next-line fp/no-mutation
-Title.propTypes = {
-  title: PropTypes.string,
-};
-
-// eslint-disable-next-line fp/no-mutation
-ContentItem.propTypes = {
-  itemContent: PropTypes.string,
-};
-
-// eslint-disable-next-line fp/no-mutation
-StoryItemCategory.propTypes = {
-  title: PropTypes.string,
-  content: PropTypes.array,
-};
