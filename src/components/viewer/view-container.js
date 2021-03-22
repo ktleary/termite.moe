@@ -1,20 +1,29 @@
-/* eslint-disable fp/no-nil */
-/* eslint-disable fp/no-unused-expression */
-
 import React, { useMemo, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { gt, indexOf, prop, toString } from "ramda";
+import {
+  compose,
+  gt,
+  indexOf,
+  or,
+  toLower,
+  prop,
+  reduce,
+  toString,
+} from "ramda";
+import { IMAGEEXTS } from "../../constants";
 import { Cell, Row } from "./grid";
 import StoryItem from "./story-item";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
-import { lenGt0, lenKeysGt0, rmNonAlpha } from "./helpers";
-import ContentItem from './content-item';
+import { gte0, lenKeysGt0, rmNonAlpha } from "./helpers";
+import ContentItem from "./content-item";
 import SearchBox from "./search-box";
+import SentimentScore from "./sentiment-score";
+import SiteName from "./site-name";
 import StoryItemCategory from "./story-item-category";
 import StoryText from "./story-text";
-import Title from './title';
+import Title from "./title";
 import { StoryItemTitle } from "./story-style";
 
 const ViewWrapper = styled.div`
@@ -34,8 +43,6 @@ const Panel = styled.div`
   width: 78%;
 `;
 
-
-
 const MessageWrapper = styled(Cell)`
   align-self: center;
   color: rgba(187, 134, 252, 1);
@@ -45,58 +52,23 @@ const MessageWrapper = styled(Cell)`
   width: 100%;
 `;
 
-const SentimentScoreDisplay = styled.div`
-  color: ${({ score }) =>
-    score >= 0 ? "rgba(2, 218, 197, 0.87)" : "rgba(255, 65, 129, 0.87)"};
-  font-size: 100%;
-`;
-
-const SentimentWrapper = styled.div`
-  align-items: center;
-  display: flex;
-`;
-
 const ContentContainer = styled.div`
   margin-top: 4px;
 `;
 
-const sentimentScore = sentiments => prop("score", sentiments);
+const getScore = xo => prop("score", xo);
 
-const SentimentScore = ({ score }) => {
-  return (
-    <SentimentWrapper>
-      <Cell>sentiment score: </Cell>
-      <SentimentScoreDisplay score={score}>{score}</SentimentScoreDisplay>
-    </SentimentWrapper>
-  );
-};
-
-const ImageItem = ({ url }) => {
-  const imageExts = ["jpg", "png", "gif"];
-  const isImage = imageExts.reduce(
-    (b, ext) => (!b && url && url.indexOf(ext) > -1 ? true : b),
-    false
-  );
-  return isImage ? <img src={url} style={{ height: 48 }} /> : url;
-};
+const getSentimentScore = content => getScore(prop("sentiments", content));
 
 const qualifyImageUrl = url =>
   gt(indexOf("http", url), -1) ? url : "https://".concat(url);
 
-const isImage = xs => {
-  // eslint-disable-next-line fp/no-let
-  let flag = false;
-  ["gif", "jpg", "jpeg", "png"].forEach(ext => {
-    // eslint-disable-next-line fp/no-mutation
-    if (xs.indexOf(ext) > -1) flag = true;
-  });
-  return flag;
-};
+const idxOfX = (x, ext) => indexOf(ext, x);
+const idxOfXGte0 = compose(gte0, idxOfX);
+const checkMatch = (xs, target) => idxOfXGte0(toLower(xs), target);
 
-const SiteName = ({ name }) => (lenGt0(name) ? <Cell>{name}</Cell> : null);
-
-
-
+const isImage = xs =>
+  reduce((result, ext) => or(result, checkMatch(xs, ext)), false, IMAGEEXTS);
 
 // -- Main -------
 const ViewContainer = ({ token, isLoggedIn }) => {
@@ -111,6 +83,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   const handleChange = e => setUrl(e.target.value);
   const handleClose = () => setUrl("");
   const handleSubmit = async () => {
+    // eslint-disable-next-line fp/no-unused-expression
     setMsg("fetching results ... ");
     const storyContent = await fetchStory(url);
     return setContent(storyContent, setMsg(""));
@@ -134,7 +107,8 @@ const ViewContainer = ({ token, isLoggedIn }) => {
           <Row>
             <MessageWrapper>{msg}</MessageWrapper>
           </Row>
-        ) : null}
+        ) : // eslint-disable-next-line fp/no-nil
+        null}
 
         {contentAvailable && (
           <ContentContainer>
@@ -145,9 +119,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             <Row>
               <ContentItem itemContent={prop("byline", content)} /> wordcount{" "}
               <ContentItem itemContent={toString(prop("wordcount", content))} />
-              <SentimentScore
-                score={sentimentScore(prop("sentiments", content))}
-              />
+              <SentimentScore score={getSentimentScore(content)} />
             </Row>
             <Row>
               <ContentItem itemContent={prop("excerpt", content)} />
@@ -201,7 +173,8 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             </Row>
             {content && content.sentences ? (
               <StoryText text={content.sentences} />
-            ) : null}
+            ) : // eslint-disable-next-line fp/no-nil
+            null}
           </ContentContainer>
         )}
       </Panel>
@@ -217,19 +190,3 @@ ViewContainer.propTypes = {
   isLoggedIn: PropTypes.bool,
   token: PropTypes.any,
 };
-
-// eslint-disable-next-line fp/no-mutation
-ImageItem.propTypes = {
-  url: PropTypes.string,
-};
-
-// eslint-disable-next-line fp/no-mutation
-SentimentScore.propTypes = {
-  score: PropTypes.number,
-};
-
-// eslint-disable-next-line fp/no-mutation
-SiteName.propTypes = {
-  name: PropTypes.string,
-};
-
