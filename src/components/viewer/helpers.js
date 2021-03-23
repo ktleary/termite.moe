@@ -1,4 +1,15 @@
-import { compose, gt, gte, keys, length, lte, map, trim } from "ramda";
+import {
+  compose,
+  gt,
+  gte,
+  indexOf,
+  keys,
+  length,
+  lte,
+  map,
+  toLower,
+  trim,
+} from "ramda";
 import { capitalize } from "../../util";
 
 const gt0 = xn => gt(xn, 0);
@@ -21,8 +32,13 @@ const lenLt0 = compose(lte0, length);
 const lenKeys = compose(length, keys);
 const lenKeysGt0 = compose(gt0, lenKeys);
 
+const idxOfX = (x, ext) => indexOf(ext, x);
+const idxOfXGte0 = compose(gte0, idxOfX);
+const checkMatch = (xs, target) => idxOfXGte0(toLower(xs), target);
+
 // eslint-disable-next-line fp/no-mutation
 export {
+  checkMatch,
   gt0,
   gte0,
   lenGt0,

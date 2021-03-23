@@ -1,29 +1,23 @@
 import React, { useMemo, useState } from "react";
-import PropTypes from "prop-types";
+
+import { ViewContainerProps } from "./types";
 import styled from "styled-components";
-import {
-  compose,
-  gt,
-  indexOf,
-  or,
-  toLower,
-  prop,
-  reduce,
-  toString,
-} from "ramda";
+import { gt, indexOf, not, or, prop, reduce, toString } from "ramda";
 import { IMAGEEXTS } from "../../constants";
-import { Cell, Row } from "./grid";
-import StoryItem from "./story-item";
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
-import { gte0, lenKeysGt0, rmNonAlpha } from "./helpers";
-import ContentItem from "./content-item";
+import { checkMatch, lenKeysGt0, rmNonAlpha } from "./helpers";
+
+import ContentHeader from "./content-header";
+import ContentSubHeader from "./content-subheader";
+import Excerpt from "./excerpt";
+import Message from "./message";
+import Quotes from "./quotes";
 import SearchBox from "./search-box";
-import SentimentScore from "./sentiment-score";
-import SiteName from "./site-name";
-import StoryItemCategory from "./story-item-category";
+import StoryItem from "./story-item";
 import StoryText from "./story-text";
-import Title from "./title";
+import Vitals from "./vitals";
+import { Cell, Row } from "./grid";
 import { StoryItemTitle } from "./story-style";
 
 const ViewWrapper = styled.div`
@@ -43,15 +37,6 @@ const Panel = styled.div`
   width: 78%;
 `;
 
-const MessageWrapper = styled(Cell)`
-  align-self: center;
-  color: rgba(187, 134, 252, 1);
-  height: 32px;
-  font-size: 20px;
-  text-align: center;
-  width: 100%;
-`;
-
 const ContentContainer = styled.div`
   margin-top: 4px;
 `;
@@ -63,16 +48,10 @@ const getSentimentScore = content => getScore(prop("sentiments", content));
 const qualifyImageUrl = url =>
   gt(indexOf("http", url), -1) ? url : "https://".concat(url);
 
-const idxOfX = (x, ext) => indexOf(ext, x);
-const idxOfXGte0 = compose(gte0, idxOfX);
-const checkMatch = (xs, target) => idxOfXGte0(toLower(xs), target);
-
 const isImage = xs =>
   reduce((result, ext) => or(result, checkMatch(xs, ext)), false, IMAGEEXTS);
 
-// -- Main -------
 const ViewContainer = ({ token, isLoggedIn }) => {
-  // -- State ------
   const [content, setContent] = useState();
   const [msg, setMsg] = useState("");
   const [url, setUrl] = useState("");
@@ -80,7 +59,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   const urlValid = useMemo(() => validateUrl(url));
   const contentAvailable = useMemo(() => lenKeysGt0(content));
 
-  const handleChange = e => setUrl(e.target.value);
+  const handleChange = e => setUrl(prop("value", e.target));
   const handleClose = () => setUrl("");
   const handleSubmit = async () => {
     // eslint-disable-next-line fp/no-unused-expression
@@ -89,7 +68,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     return setContent(storyContent, setMsg(""));
   };
 
-  return !isLoggedIn ? (
+  return not(isLoggedIn) ? (
     <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>
   ) : (
     <ViewWrapper>
@@ -103,43 +82,22 @@ const ViewContainer = ({ token, isLoggedIn }) => {
           url={url}
           data-testid="quick-input"
         />
-        {msg.length ? (
-          <Row>
-            <MessageWrapper>{msg}</MessageWrapper>
-          </Row>
-        ) : // eslint-disable-next-line fp/no-nil
-        null}
+        <Message message={msg} />
 
         {contentAvailable && (
           <ContentContainer>
-            <Row>
-              <SiteName name={prop("siteName", content)} />
-              <Title title={prop("title", content)} />
-            </Row>
-            <Row>
-              <ContentItem itemContent={prop("byline", content)} /> wordcount{" "}
-              <ContentItem itemContent={toString(prop("wordcount", content))} />
-              <SentimentScore score={getSentimentScore(content)} />
-            </Row>
-            <Row>
-              <ContentItem itemContent={prop("excerpt", content)} />
-            </Row>
-
-            <StoryItemCategory title={"What"} content={prop("what", content)} />
-
-            <StoryItemCategory title={"Who"} content={prop("who", content)} />
-
-            <StoryItemCategory
-              title={"Where: "}
-              content={prop("where", content)}
+            <ContentHeader
+              siteName={prop("siteName", content)}
+              title={prop("title", content)}
             />
-
-            <StoryItemCategory title={"When"} content={prop("when", content)} />
-
-            <StoryItemCategory
-              title={"In Quotes"}
-              content={prop("quotes", content)}
+            <ContentSubHeader
+              score={getSentimentScore(content)}
+              byline={prop("byline", content)}
+              wordcount={toString(prop("wordcount", content))}
             />
+            <Excerpt excerpt={prop("excerpt", content)} />
+            <Vitals content={content} />
+            <Quotes quotes={prop("quotes", content)} />
 
             <Row>
               <StoryItemTitle>Numbers: </StoryItemTitle>
@@ -185,8 +143,4 @@ const ViewContainer = ({ token, isLoggedIn }) => {
 export default ViewContainer;
 
 // eslint-disable-next-line fp/no-mutation
-ViewContainer.propTypes = {
-  setToken: PropTypes.func,
-  isLoggedIn: PropTypes.bool,
-  token: PropTypes.any,
-};
+ViewContainer.propTypes = ViewContainerProps;
