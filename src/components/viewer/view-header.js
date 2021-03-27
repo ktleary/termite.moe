@@ -46,11 +46,8 @@ const ViewHeader = ({ setToken }) => {
   const history = useHistory();
 
   const handleSignOut = () => {
-    // eslint-disable-next-line fp/no-unused-expression
     localStorage.removeItem("token");
-    // eslint-disable-next-line fp/no-unused-expression
     setToken("");
-    // eslint-disable-next-line fp/no-mutating-methods
     return history.push("/");
   };
   return (
@@ -71,7 +68,6 @@ const ViewHeader = ({ setToken }) => {
 
 export default ViewHeader;
 
-// eslint-disable-next-line fp/no-mutation
 ViewHeader.propTypes = {
   setToken: PropTypes.func,
 };

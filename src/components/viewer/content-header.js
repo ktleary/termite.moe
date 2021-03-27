@@ -13,7 +13,6 @@ const ContentHeader = ({ siteName, title }) => (
 
 export default ContentHeader;
 
-// eslint-disable-next-line fp/no-mutation
 ContentHeader.propTypes = {
   siteName: string,
   title: string,

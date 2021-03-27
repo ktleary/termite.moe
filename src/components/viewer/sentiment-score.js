@@ -25,7 +25,6 @@ const SentimentScore = ({ score }) => {
 
 export default SentimentScore;
 
-// eslint-disable-next-line fp/no-mutation
 SentimentScore.propTypes = {
   score: PropTypes.number,
 };

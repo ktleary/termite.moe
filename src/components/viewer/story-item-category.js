@@ -35,7 +35,6 @@ const StoryItemCategory = ({ title, content }) => (
 
 export default StoryItemCategory;
 
-// eslint-disable-next-line fp/no-mutation
 StoryItemCategory.propTypes = {
   title: PropTypes.string,
   content: PropTypes.array,

@@ -11,12 +11,10 @@ const StoryTitle = styled(Cell)`
 `;
 
 const Title = ({ title }) =>
-  // eslint-disable-next-line fp/no-nil
   lenGt0(title) ? <StoryTitle>{title}</StoryTitle> : null;
 
 export default Title;
 
-// eslint-disable-next-line fp/no-mutation
 Title.propTypes = {
   title: PropTypes.string,
 };

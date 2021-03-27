@@ -12,7 +12,6 @@ const ImageItem = ({ url }) => {
 
 export default ImageItem;
 
-// eslint-disable-next-line fp/no-mutation
 ImageItem.propTypes = {
   url: PropTypes.string,
 };

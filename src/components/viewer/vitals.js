@@ -22,7 +22,6 @@ const Vitals = ({ content }) =>
 
 export default Vitals;
 
-// eslint-disable-next-line fp/no-mutation
 Vitals.propTypes = {
   content: any,
 };

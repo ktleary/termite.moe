@@ -15,7 +15,7 @@ const SubmitIcon = ({ className }) => (
 );
 
 export default SubmitIcon;
-// eslint-disable-next-line fp/no-mutation
+
 SubmitIcon.propTypes = {
   className: PropTypes.string,
 };

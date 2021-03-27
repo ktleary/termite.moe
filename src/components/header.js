@@ -65,7 +65,6 @@ const Header = ({ setToken, isLoggedIn }) => {
 
 export default Header;
 
-// eslint-disable-next-line fp/no-mutation
 Header.propTypes = {
   setToken: PropTypes.func,
   isLoggedIn: PropTypes.bool,

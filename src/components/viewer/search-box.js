@@ -71,7 +71,6 @@ const SearchBox = ({
 
 export default SearchBox;
 
-// eslint-disable-next-line fp/no-mutation
 SearchBox.propTypes = {
   handleChange: PropTypes.func,
   handleClose: PropTypes.func,

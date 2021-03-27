@@ -36,7 +36,6 @@ const idxOfX = (x, ext) => indexOf(ext, x);
 const idxOfXGte0 = compose(gte0, idxOfX);
 const checkMatch = (xs, target) => idxOfXGte0(toLower(xs), target);
 
-// eslint-disable-next-line fp/no-mutation
 export {
   checkMatch,
   gt0,

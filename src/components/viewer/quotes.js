@@ -8,7 +8,6 @@ const Quotes = ({ quotes }) => (
 
 export default Quotes;
 
-// eslint-disable-next-line fp/no-mutation
 Quotes.propTypes = {
   quotes: array,
 };

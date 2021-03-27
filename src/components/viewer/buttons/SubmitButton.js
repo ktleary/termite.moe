@@ -38,7 +38,7 @@ const SubmitButton = ({ disabled, handleClick }) => (
 );
 
 export default SubmitButton;
-// eslint-disable-next-line fp/no-mutation
+
 SubmitButton.propTypes = {
   handleClick: PropTypes.func,
   disabled: PropTypes.bool,

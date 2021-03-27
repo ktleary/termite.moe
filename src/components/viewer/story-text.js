@@ -36,7 +36,7 @@ const Sentence = styled.div`
   margin: auto;
   padding: 4px;
 `;
-/* eslint-disable fp/no-nil */
+
 const StoryText = sentences => {
   const { text } = sentences;
   const [fullText, setFullText] = useState(true);

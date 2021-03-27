@@ -18,12 +18,11 @@ const Message = ({ message }) =>
     <Row>
       <MessageWrapper>{message}</MessageWrapper>
     </Row>
-  ) : // eslint-disable-next-line fp/no-nil
+  ) :
   null;
 
 export default Message;
 
-// eslint-disable-next-line fp/no-mutation
 Message.propTypes = {
   message: PropTypes.string,
 };

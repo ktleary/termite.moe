@@ -11,7 +11,6 @@ const Excerpt = ({ excerpt }) => (
 
 export default Excerpt;
 
-// eslint-disable-next-line fp/no-mutation
 Excerpt.propTypes = {
   excerpt: string,
 };

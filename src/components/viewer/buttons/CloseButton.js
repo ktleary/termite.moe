@@ -38,7 +38,7 @@ const CloseButton = ({ disabled, handleClick }) => (
 );
 
 export default CloseButton;
-// eslint-disable-next-line fp/no-mutation
+
 CloseButton.propTypes = {
   handleClick: PropTypes.bool,
   disabled: PropTypes.bool,

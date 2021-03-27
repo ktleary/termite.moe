@@ -14,10 +14,5 @@ const setToken = ({ token }) => {
 
 export const UNSAFEuserLogin = async ({ username, password }) => {
   const token = await authorizeUser({ username, password });
-  if (!token) return false;
-  // eslint-disable-next-line fp/no-unused-expression
-  setToken({ token });
-  // eslint-disable-next-line fp/no-unused-expression
-  console.log(token);
-  return true;
+  return !token ? false : setToken({ token });
 };

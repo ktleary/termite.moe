@@ -2,23 +2,24 @@ import React, { useMemo, useState } from "react";
 
 import { ViewContainerProps } from "./types";
 import styled from "styled-components";
-import { gt, indexOf, not, or, prop, reduce, toString } from "ramda";
-import { IMAGEEXTS } from "../../constants";
+import { not, prop, toString } from "ramda";
+
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
-import { checkMatch, lenKeysGt0, rmNonAlpha } from "./helpers";
+import { lenKeysGt0 } from "./helpers";
 
 import ContentHeader from "./content-header";
 import ContentSubHeader from "./content-subheader";
 import Excerpt from "./excerpt";
+import Mentions from "./mentions";
 import Message from "./message";
+import Numbers from "./numbers";
 import Quotes from "./quotes";
 import SearchBox from "./search-box";
-import StoryItem from "./story-item";
 import StoryText from "./story-text";
+import Urls from "./urls";
 import Vitals from "./vitals";
-import { Cell, Row } from "./grid";
-import { StoryItemTitle } from "./story-style";
+
 
 const ViewWrapper = styled.div`
   max-width: 1100px;
@@ -42,14 +43,7 @@ const ContentContainer = styled.div`
 `;
 
 const getScore = xo => prop("score", xo);
-
 const getSentimentScore = content => getScore(prop("sentiments", content));
-
-const qualifyImageUrl = url =>
-  gt(indexOf("http", url), -1) ? url : "https://".concat(url);
-
-const isImage = xs =>
-  reduce((result, ext) => or(result, checkMatch(xs, ext)), false, IMAGEEXTS);
 
 const ViewContainer = ({ token, isLoggedIn }) => {
   const [content, setContent] = useState();
@@ -62,8 +56,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
   const handleChange = e => setUrl(prop("value", e.target));
   const handleClose = () => setUrl("");
   const handleSubmit = async () => {
-    // eslint-disable-next-line fp/no-unused-expression
-    setMsg("fetching results ... ");
+    setMsg("Fetching results ... ");
     const storyContent = await fetchStory(url);
     return setContent(storyContent, setMsg(""));
   };
@@ -83,7 +76,6 @@ const ViewContainer = ({ token, isLoggedIn }) => {
           data-testid="quick-input"
         />
         <Message message={msg} />
-
         {contentAvailable && (
           <ContentContainer>
             <ContentHeader
@@ -98,41 +90,10 @@ const ViewContainer = ({ token, isLoggedIn }) => {
             <Excerpt excerpt={prop("excerpt", content)} />
             <Vitals content={content} />
             <Quotes quotes={prop("quotes", content)} />
-
-            <Row>
-              <StoryItemTitle>Numbers: </StoryItemTitle>
-              {content &&
-                content.numbers &&
-                content.numbers
-                  .map(i => i.text.toString())
-                  .map(rmNonAlpha)
-                  .map((n, i) => <StoryItem key={`numbers-${i}}`} item={n} />)}
-            </Row>
-            <Row>
-              {content &&
-                content.urls &&
-                content.urls.map(qualifyImageUrl).map((url, i) =>
-                  isImage(url) ? (
-                    <Cell key={`img-${i}`}>
-                      <img src={url} height="200px" />
-                    </Cell>
-                  ) : (
-                    <Cell key={`img-${i}`}>{url}</Cell>
-                  )
-                )}
-            </Row>
-            <Row>
-              <StoryItemTitle>Mentions: </StoryItemTitle>
-              {content &&
-                content.mentions &&
-                content.mentions.map((n, i) => (
-                  <StoryItem key={`numbers-${i}}`} item={n} />
-                ))}
-            </Row>
-            {content && content.sentences ? (
-              <StoryText text={content.sentences} />
-            ) : // eslint-disable-next-line fp/no-nil
-            null}
+            <Numbers numbers={prop("numbers", content)} />
+            <Urls urls={prop("urls", content)} />
+            <Mentions mentions={prop("mentions", content)} />
+            <StoryText text={content.sentences} />
           </ContentContainer>
         )}
       </Panel>
@@ -142,5 +103,4 @@ const ViewContainer = ({ token, isLoggedIn }) => {
 
 export default ViewContainer;
 
-// eslint-disable-next-line fp/no-mutation
 ViewContainer.propTypes = ViewContainerProps;

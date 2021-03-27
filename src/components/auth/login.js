@@ -73,17 +73,12 @@ export default function Login({ setToken }) {
   };
 
   const handleSubmit = async e => {
-    // eslint-disable-next-line fp/no-unused-expression
     e.preventDefault();
     const token = await loginUser({
       username,
       password,
     });
-    // eslint-disable-next-line fp/no-mutating-methods, fp/no-unused-expression
     return setToken(token, history.push("/viewer"));
-    // eslint-disable-next-line fp/no-mutating-methods
-
-    // eslint-disable-next-line fp/no-mutating-methods
   };
 
   return (
@@ -131,7 +126,6 @@ export default function Login({ setToken }) {
   );
 }
 
-// eslint-disable-next-line fp/no-mutation
 Login.propTypes = {
   setToken: PropTypes.func.isRequired,
 };

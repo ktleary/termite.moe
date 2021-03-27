@@ -19,7 +19,7 @@ const CloseIcon = ({ className }) => (
 );
 
 export default CloseIcon;
-// eslint-disable-next-line fp/no-mutation
+
 CloseIcon.propTypes = {
   className: PropTypes.string,
 };

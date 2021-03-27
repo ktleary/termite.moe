@@ -14,7 +14,6 @@ const ContentSubHeader = ({ byline, score, wordcount }) => (
 
 export default ContentSubHeader;
 
-// eslint-disable-next-line fp/no-mutation
 ContentSubHeader.propTypes = {
   byline: string,
   score: number,

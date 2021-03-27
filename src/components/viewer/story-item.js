@@ -17,7 +17,6 @@ const StoryItem = ({ item }) => <StoryItemCell>{item}</StoryItemCell>;
 
 export default StoryItem;
 
-// eslint-disable-next-line fp/no-mutation
 StoryItem.propTypes = {
   item: PropTypes.any,
   title: PropTypes.string,
