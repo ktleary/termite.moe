@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import styled from "styled-components";
 import FullTextButton from "./buttons/FullTextButton";
-import { equals, not } from "ramda";
+import { equals, not, replace } from "ramda";
 import { lenGt0 } from "./helpers";
 
 const TextContainer = styled.div``;
@@ -17,7 +17,6 @@ const SentencesContainer = styled.div`
   overflow-y: auto;
   overflow-x: hidden;
   padding: 8px;
-  width: 78%;
   &:hover {
     border: 1px solid rgba(72, 72, 74, 1);
   }
@@ -37,6 +36,10 @@ const Sentence = styled.div`
   padding: 4px;
 `;
 
+
+
+const removeHttp = xs => replace(/http.*?\s/g, " ", xs);
+
 const StoryText = sentences => {
   const { text } = sentences;
   const [fullText, setFullText] = useState(true);
@@ -44,14 +47,14 @@ const StoryText = sentences => {
   const handleClick = () => setFullText(not(fullText));
   return (
     <TextContainer>
+      <FullTextButton disabled={noText} handleClick={handleClick} />
       {equals(fullText, true) ? (
         <SentencesContainer>
           {text.map((sentence, i) => (
-            <Sentence key={`sentence-${i}`}>{sentence}</Sentence>
+            <Sentence key={`sentence-${i}`}>{removeHttp(sentence)}</Sentence>
           ))}
         </SentencesContainer>
       ) : null}
-      <FullTextButton disabled={noText} handleClick={handleClick} />
     </TextContainer>
   );
 };

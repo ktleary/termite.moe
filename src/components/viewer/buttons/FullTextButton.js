@@ -8,13 +8,12 @@ const FullText = styled.button`
   background: transparent;
   border: 1px solid rgba(60, 60, 67, 0.3);
   border-radius: 6px;
-  color: rgba(255, 255, 255, 0.66);
+  color: rgba(255, 255, 255, 0.87);
   cursor: pointer;
   display: flex;
   font-size: 18px;
   height: 20px;
   justify-content: center;
-  margin: auto;
   outline: 0;
   &:hover {
     color: rgba(255, 255, 255, 1);
@@ -30,7 +29,7 @@ const FullText = styled.button`
 
 const FullTextButton = ({ disabled, handleClick }) => (
   <FullText onClick={handleClick} disabled={disabled}>
-    Toggle Full Text
+    Full Text
   </FullText>
 );
 

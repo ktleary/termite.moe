@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 
 import { ViewContainerProps } from "./types";
 import styled from "styled-components";
-import { not, prop, toString } from "ramda";
+import { not, prop, toString, uniq } from "ramda";
 
 import { fetchStory } from "../../http";
 import { validateUrl } from "../../util";
@@ -19,7 +19,6 @@ import SearchBox from "./search-box";
 import StoryText from "./story-text";
 import Urls from "./urls";
 import Vitals from "./vitals";
-
 
 const ViewWrapper = styled.div`
   max-width: 1100px;
@@ -88,12 +87,12 @@ const ViewContainer = ({ token, isLoggedIn }) => {
               wordcount={toString(prop("wordcount", content))}
             />
             <Excerpt excerpt={prop("excerpt", content)} />
-            <Vitals content={content} />
-            <Quotes quotes={prop("quotes", content)} />
-            <Numbers numbers={prop("numbers", content)} />
-            <Urls urls={prop("urls", content)} />
-            <Mentions mentions={prop("mentions", content)} />
             <StoryText text={content.sentences} />
+            <Quotes quotes={prop("quotes", content)} />
+            <Vitals content={content} />
+            <Numbers numbers={prop("numbers", content)} />
+            <Urls urls={uniq(prop("urls", content))} />
+            <Mentions mentions={prop("mentions", content)} />
           </ContentContainer>
         )}
       </Panel>
