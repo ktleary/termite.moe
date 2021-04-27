@@ -10,8 +10,6 @@ import About from "./components/about";
 import ViewContainer from "./components/viewer/view-container";
 import useToken from "./components/auth/useToken";
 
-import Header from "./components/header";
-
 const Main = styled.main`
   margin: 0 auto;
   max-width: 1100px;
@@ -19,8 +17,11 @@ const Main = styled.main`
 `;
 
 const AppWrapper = styled.div`
-  max-width: 1100px;
   width: 100%;
+  background-image: url(/woodpile.jpg);
+  background-position: center;
+  background-size: cover;
+  height: 100vh;
 `;
 
 const checkAuth = token => R.gt(R.length(token), 1);
@@ -38,7 +39,6 @@ function App() {
       </Helmet>
       <Router>
         <Main>
-          <Header isLoggedIn={isLoggedIn} setToken={setToken} />
           <Switch>
             <Route path="/viewer">
               <ViewContainer token={token} isLoggedIn={isLoggedIn} />
