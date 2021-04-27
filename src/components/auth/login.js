@@ -52,7 +52,7 @@ const SubmitButton = styled.button`
 `;
 
 async function loginUser(credentials) {
-  return fetch("http://localhost:3000/login", {
+  return fetch("https://termite.moe/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

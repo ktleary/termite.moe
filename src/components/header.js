@@ -42,7 +42,7 @@ const Header = ({ setToken, isLoggedIn }) => {
   ) : (
     <HeaderContainer>
       <Logo>
-        <NavLink to="/">Beetz</NavLink>
+        <NavLink to="/">termite</NavLink>
       </Logo>
       <Nav>
         <NavItem>
