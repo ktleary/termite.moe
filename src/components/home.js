@@ -1,8 +1,8 @@
 import React from "react";
 import styled from "styled-components";
+import ShowMeButton from "./viewer/buttons/ShowMeButton";
 
 const HomeContainer = styled.div`
-  border: 1px solid rgba(255, 255, 255, 0.33);
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -27,7 +27,6 @@ const HomeContent = styled.div`
 
 const Title = styled.h1`
   font-size: 170px;
-  font-family: Roboto, sans-serif;
   font-weight: normal;
   margin: 0;
   padding: 0;
@@ -42,12 +41,19 @@ const Subtitle = styled.h3`
   padding: 0;
 `;
 
+const ShowMeWrapper = styled.div`
+
+`;
+
 const Home = () => (
   <HomeContainer>
     <HomeHeader>Sign In</HomeHeader>
     <HomeMain>
-      <Title>Termite</Title>
-      <Subtitle>BREAK DOWN WEB POSTS IN A FLASH</Subtitle>
+      <Title>TERMITE</Title>
+      <Subtitle>BREAK DOWN CONTENT IN THE BLINK OF AN EYE</Subtitle>
+      <ShowMeWrapper>
+        <ShowMeButton />
+      </ShowMeWrapper>
     </HomeMain>
     <HomeContent>
       Termite uses Natural Language Processing (NLP) to extract and analyze
