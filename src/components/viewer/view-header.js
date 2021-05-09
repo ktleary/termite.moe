@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Link, useHistory } from "react-router-dom";
+import useToken from "../auth/useToken";
 
 const HeaderContainer = styled.div`
   align-items: center;
@@ -28,9 +29,8 @@ const NavItem = styled.div`
 `;
 
 const SignOut = styled(NavItem)`
-  padding-right: 16px;
+  padding-right: 4vw;
   text-align: right;
-
 `;
 
 const NavLink = styled(Link)`
@@ -42,8 +42,10 @@ const NavLink = styled(Link)`
   }
 `;
 
-const ViewHeader = ({ setToken }) => {
+const ViewHeader = () => {
   const history = useHistory();
+  // eslint-disable-next-line no-unused-vars
+  const { token, setToken } = useToken();
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -53,7 +55,7 @@ const ViewHeader = ({ setToken }) => {
   return (
     <HeaderContainer>
       <Logo>
-        <NavLink to="/">Beetz</NavLink>
+        <NavLink to="/">TERMITE</NavLink>
       </Logo>
       <Nav>
         <NavItem>

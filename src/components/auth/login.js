@@ -85,7 +85,7 @@ export default function Login({ setToken }) {
     <LoginContainer>
       <Row>
         <Cell>
-          <LoginTitle>Login</LoginTitle>
+          <LoginTitle>Termite Login</LoginTitle>
         </Cell>
       </Row>
       <LoginForm>
@@ -110,9 +110,6 @@ export default function Login({ setToken }) {
               onChange={handleChange}
             />
           </Cell>
-        </Row>
-        <Row>
-          <Cell>message</Cell>
         </Row>
         <Row>
           <Cell>

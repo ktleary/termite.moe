@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import ViewHeader from "./view-header";
 
 import { ViewContainerProps } from "./types";
 import styled from "styled-components";
@@ -64,6 +65,7 @@ const ViewContainer = ({ token, isLoggedIn }) => {
     <div>{JSON.stringify({ token, isLoggedIn })} not logged in</div>
   ) : (
     <ViewWrapper>
+      <ViewHeader setToken={() => {}} />
       <Panel>
         <SearchBox
           handleChange={handleChange}

@@ -17,11 +17,7 @@ const Main = styled.main`
 `;
 
 const AppWrapper = styled.div`
-  width: 100%;
-  background-image: url(/woodpile.jpg);
-  background-position: center;
-  background-size: cover;
-  height: 100vh;
+
 `;
 
 const checkAuth = token => R.gt(R.length(token), 1);
@@ -34,8 +30,8 @@ function App() {
     <AppWrapper>
       <Helmet>
         <html lang="en" />
-        <title>Beetz Home</title>
-        <meta name="description" content="Extract sources from text." />
+        <title>Termite Viewer</title>
+        <meta name="description" content="Break down content in the blink of an eye." />
       </Helmet>
       <Router>
         <Main>
