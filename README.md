@@ -1,11 +1,12 @@
-# beetz
+# TERMITE VIEWER
 
-Extract source materials from text
+Frontend to termite api.
 
 ## Installation
 
 - git clone
-- npm install
+- yarn install
+- yarn start
 
 ## Test
 
