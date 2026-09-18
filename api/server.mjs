@@ -1,5 +1,4 @@
 import "dotenv/config";
-import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
 import {
@@ -125,8 +124,6 @@ app.post("/api/v1/deconstruct", async (req, res) => {
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  app.listen(PORT, () => console.log(`termite-api ${PORT}`));
-}
+app.listen(PORT, () => console.log(`termite-api ${PORT}`));
 
 export { app, fetchArticle, injectionRisk };
